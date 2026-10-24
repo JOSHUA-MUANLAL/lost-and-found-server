@@ -11,6 +11,10 @@ router.get('/getuserfounddata',authentication,async(req,res)=>{
     await DashboardController.getUserFoundData(req,res)
 })
 
+router.get('/getuserdata',authentication,async(req,res)=>{
+    await DashboardController.getUserLostData(req,res)
+})
+
 router.get('/getlostitems',authentication,async(req,res)=>{
     await DashboardController.getLostItems(req,res)
 })
@@ -41,6 +45,10 @@ router.post('/claimItem',authentication,async(req,res)=>{
 
 router.get('/getitem/:postId',authentication,async(req,res)=>{
     await DashboardController.getItem(req,res)
+})
+
+router.delete('/deleteitem/:id',authentication,async(req,res)=>{
+    await DashboardController.deleteItem(req,res)
 })
 
 module.exports=router;

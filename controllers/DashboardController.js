@@ -22,7 +22,31 @@ class DahboardController{
         }
     }
 
-     async getUserFoundData(req,res){
+    async getUserData(req,res){
+        try{
+            const email=req.userdetail.email;
+            const user=await UserModel.findOne({Email:email}).select('-Password')
+            if(user){
+                const item=await ItemModel.find({FoundBy:email})
+                if(item){
+                    res.status(200).json({user,item})
+                }
+            }else{
+                res.status(404).json({message:"Failed to get user data"})
+            }
+
+        }catch(error){
+            console.log(error)
+            res.status(404).json({message:"Failed to get user data"})
+            
+            
+
+        }
+    }
+
+    
+
+    async getUserFoundData(req,res){
         try{
             let userEmail=req.userdetail.email;
             let result=await ItemModel.find({PostBy:userEmail,Type:'found'});
@@ -375,7 +399,8 @@ async addFriend(req, res) {
 
 async deleteItem(req,res){
     try{
-        const pw=req.body.pw;
+        console.log("delete")
+        const {pw}=req.body;
         const id=req.params.id;
         const userEmail=req.userdetail.email;
 
