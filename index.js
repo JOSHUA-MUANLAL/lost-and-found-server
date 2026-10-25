@@ -41,6 +41,6 @@ app.use('/registration',registerroute)
 app.use('/login',loginrouter)
 app.use('/dashboard',dashboardrouter)
 
-server.listen(3000, () => {
+server.listen(3000,'0.0.0.0', () => {
     console.log('Server is running on http://localhost:3000');
   })

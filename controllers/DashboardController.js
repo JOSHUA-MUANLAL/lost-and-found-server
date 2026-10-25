@@ -360,11 +360,11 @@ async addFriend(req, res) {
             console.log('already Friends')
             return res.status(202).json({
                 message: "Already friends",
-                contact: {
+                contact:[ {
                     email: user2.Email,
                     name: user2.Name,
                     room: user1.Contact.Room
-        }
+        }]
     });
         }
 

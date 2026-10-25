@@ -7,11 +7,11 @@ try{
         Email:String,
         Password:String,
         Number:Number,
-        Contact:{
+        Contact:[{
             Room:String,
             Email:String,
             Name:String
-        }
+        }]
         ,
         FoundItem:[{
             ItemId:String,
