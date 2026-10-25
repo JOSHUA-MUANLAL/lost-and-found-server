@@ -159,6 +159,17 @@ class DahboardController{
         }
 
         const otp=Math.floor(100000+Math.random()*900000)
+        if(type=='lost'){
+            const user = await UserModel.findOneAndUpdate(
+                { Email: userEmail },
+                {
+                    $inc: {
+                        NoOfLost:1
+                    }
+                },
+                { new: true }
+            );
+        }
 
         
 
@@ -176,8 +187,9 @@ class DahboardController{
             Image:images,
             OTP:otp
         });
+        
 
-        console.log(newItem)
+        console.log(newItem._id)
 
         await newItem.save();
 
@@ -224,7 +236,9 @@ class DahboardController{
                     }
                     },
                     $inc: {
-                    Points: 6
+                    Points: 6,
+                    MoneyEarn: item.Prize,
+                    NoOfFound:1
                     }
                 },
                 { new: true }
@@ -283,7 +297,8 @@ class DahboardController{
                     }
                     },
                     $inc: {
-                    Points: 3
+                    Points: 3,
+                    NoOfFound:1
                     }
                 },
                 { new: true }
@@ -400,12 +415,14 @@ async addFriend(req, res) {
 async deleteItem(req,res){
     try{
         console.log("delete")
-        const {pw}=req.body;
+        const pw=req.body?.password;
         const id=req.params.id;
         const userEmail=req.userdetail.email;
+        
 
         const result=await UserModel.findOne({Email:userEmail});
         if(result){
+            console.log(`${pw} and ${result.Password}`)
 
             let compare=await bcrypt.compare(pw,result.Password);
             if(compare){

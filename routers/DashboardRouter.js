@@ -12,7 +12,7 @@ router.get('/getuserfounddata',authentication,async(req,res)=>{
 })
 
 router.get('/getuserdata',authentication,async(req,res)=>{
-    await DashboardController.getUserLostData(req,res)
+    await DashboardController.getUserData(req,res)
 })
 
 router.get('/getlostitems',authentication,async(req,res)=>{
