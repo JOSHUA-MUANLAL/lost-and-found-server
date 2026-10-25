@@ -51,4 +51,8 @@ router.delete('/deleteitem/:id',authentication,async(req,res)=>{
     await DashboardController.deleteItem(req,res)
 })
 
+router.get('/getuserachievements',authentication,async(req,res)=>{
+    await DashboardController.getUserAchievements(req,res)
+})
+
 module.exports=router;

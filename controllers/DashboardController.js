@@ -27,10 +27,8 @@ class DahboardController{
             const email=req.userdetail.email;
             const user=await UserModel.findOne({Email:email}).select('-Password')
             if(user){
-                const item=await ItemModel.find({FoundBy:email})
-                if(item){
-                    res.status(200).json({user,item})
-                }
+               
+                res.status(200).json(user)
             }else{
                 res.status(404).json({message:"Failed to get user data"})
             }
@@ -442,6 +440,24 @@ async deleteItem(req,res){
     }catch(error){
         console.log(error);
         res.status(404).json({message:"failed to delete"})
+    }
+}
+
+async getUserAchievements(req,res){
+    try{
+        const userEmail=req.userdetail.email;
+        const result=await ItemModel.find({'FoundBy.Email':userEmail})
+        if(result){
+            res.status(200).json(result)
+        }else{
+            console.log(error);
+            res.status(404).json({message:'Failed to get achievements'})
+
+        }
+
+    }catch(error){
+        console.log(error);
+        res.status(404).json({message:'Failed to get achievements'})
     }
 }
 
