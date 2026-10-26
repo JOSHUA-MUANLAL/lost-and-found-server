@@ -322,26 +322,28 @@ class DahboardController{
     }
 
    
+
 async addFriend(req, res) {
     try {
-        console.log('adding friend')
+        console.log("Adding friend");
+
         const userEmail = req.userdetail.email;
         const femail = req.body.email;
-        console.log(`create room for ${userEmail} and ${femail}`)
 
+        console.log(`Creating room for ${userEmail} and ${femail}`);
+
+        // Prevent adding yourself
         if (userEmail === femail) {
             return res.status(400).json({
                 message: "You cannot add yourself"
             });
         }
 
-        const user1 = await UserModel.findOne({
-            Email: userEmail
-        });
-
-        const user2 = await UserModel.findOne({
-            Email: femail
-        });
+        // Find both users
+        const [user1, user2] = await Promise.all([
+            UserModel.findOne({ Email: userEmail }),
+            UserModel.findOne({ Email: femail })
+        ]);
 
         if (!user1 || !user2) {
             return res.status(404).json({
@@ -349,56 +351,80 @@ async addFriend(req, res) {
             });
         }
 
-        // Check whether they already have each other as contacts
-        const user1HasUser2 =
-            user1.Contact?.Email === user2.Email;
-
-        const user2HasUser1 =
-            user2.Contact?.Email === user1.Email;
-
-        if (user1HasUser2 && user2HasUser1) {
-            console.log('already Friends')
-            return res.status(202).json({
-                message: "Already friends",
-                contact:[ {
-                    email: user2.Email,
-                    name: user2.Name,
-                    room: user1.Contact.Room
-        }]
-    });
+        // Ensure Contact arrays exist
+        if (!Array.isArray(user1.Contact)) {
+            user1.Contact = [];
         }
+
+        if (!Array.isArray(user2.Contact)) {
+            user2.Contact = [];
+        }
+
+        // Check whether each user already has the other
+        const user1HasUser2 = user1.Contact.some(
+            contact => contact.Email === user2.Email
+        );
+
+        const user2HasUser1 = user2.Contact.some(
+            contact => contact.Email === user1.Email
+        );
 
         // Generate the same room ID for both users
         const room = [user1.Email, user2.Email]
             .sort((a, b) => a.localeCompare(b))
             .join("_");
 
-        // Save each other's contact details
-        user1.Contact = {
-            Email: user2.Email,
-            Name: user2.Name,
-            Room: room
-        };
+        // If both already have each other, return the existing contact
+        if (user1HasUser2 && user2HasUser1) {
+            const existingContact = user1.Contact.find(
+                contact => contact.Email === user2.Email
+            );
 
-        user2.Contact = {
-            Email: user1.Email,
-            Name: user1.Name,
-            Room: room
-        };
+            console.log("Already friends");
 
+            return res.status(202).json({
+                message: "Already friends",
+                contact: [{
+                    email: user2.Email,
+                    name: user2.Name,
+                    room: existingContact.Room
+                }]
+            });
+        }
+
+        // Add user2 to user1's contacts only if missing
+        if (!user1HasUser2) {
+            user1.Contact.push({
+                Email: user2.Email,
+                Name: user2.Name,
+                Room: room
+            });
+        }
+
+        // Add user1 to user2's contacts only if missing
+        if (!user2HasUser1) {
+            user2.Contact.push({
+                Email: user1.Email,
+                Name: user1.Name,
+                Room: room
+            });
+        }
+
+        // Save both users
         await Promise.all([
             user1.save(),
             user2.save()
         ]);
-        console.log(' Friends success')
+
+        console.log("Friends added successfully");
 
         return res.status(200).json({
             message: "Friend added successfully",
-             contact: {
-        email: user2.Email,
-        name: user2.Name,
-        room
-    }
+            contact: [{
+                email: user2.Email,
+                name: user2.Name,
+                room: room
+            }]
         });
 
     } catch (error) {
@@ -409,6 +435,7 @@ async addFriend(req, res) {
         });
     }
 }
+
 
 async deleteItem(req,res){
     try{

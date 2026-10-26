@@ -38,10 +38,10 @@ function setupSocket(io){
 
         socket.on('get_contact',async(email)=>{
             try{
-                console.log(`getting contact ${email}`)
+                
                 const Contact=await UserModel.findOne({Email:email}).select('Contact');
                 if(Contact){
-                    console.log(`found contact $${Contact}`)
+                    
                    socket.emit('got_contact',Contact.Contact)
                 }else{
                     console.log("not found friends")

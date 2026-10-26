@@ -14,7 +14,7 @@ class RegisterController{
             let find=await UserModel.findOne({Email:userEmail})
             if(find){
                 console.log("User is Already Registered...");
-                re.status(404).jon({message:"Already Regitered"})
+                res.status(404).jon({message:"Already Regitered"})
             }else{
                 const otp=Math.floor(100000+Math.random()*900000)
                 this.otpStore[userEmail]={
